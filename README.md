@@ -89,6 +89,7 @@ Tester.test(improved_model_predict, test)
 ## **Model Results**
 - GPT-4 baseline error: $396
 - Fine-tuned LLaMA error: $127
+![Alt text](result.png)
 
 ---
 
