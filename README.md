@@ -1,3 +1,152 @@
+Fine-Tuning LLaMA with QLoRA for Price Prediction
+
+This repository contains two Jupyter notebooks for fine-tuning and testing a LLaMA model using QLoRA (Quantized Low-Rank Adaptation) to predict product prices based on text descriptions.
+
+Repository Contents
+
+training.ipynb - Fine-tunes the LLaMA model using QLoRA.
+
+testing.ipynb - Evaluates and tests the fine-tuned model's performance.
+
+Purpose
+
+This project demonstrates how to fine-tune a LLaMA model efficiently with QLoRA to predict prices based on input text. It leverages HuggingFace's Transformers and PEFT (Parameter-Efficient Fine-Tuning) libraries to reduce computational requirements while maintaining performance.
+
+Setup Instructions
+
+1. Environment Setup
+
+Ensure the required libraries are installed before running the notebooks.
+
+!pip install -q datasets requests torch peft bitsandbytes transformers trl accelerate sentencepiece wandb matplotlib
+
+2. Log in to HuggingFace and Weights & Biases
+
+HuggingFace: Create an account at HuggingFace and generate a token.
+
+Weights & Biases: Create an account at W&B and generate an API key.
+
+Save these tokens as secrets in your notebook environment under the keys:
+
+HF_TOKEN
+
+WANDB_API_KEY
+
+3. Model and Dataset
+
+Base Model: meta-llama/Meta-Llama-3.1-8B
+
+Dataset: ed-donner/pricer-data
+
+Notebook 1: Training
+
+Features:
+
+Fine-tunes the LLaMA model using QLoRA to predict product prices.
+
+Hyperparameters and configurations for LoRA and training can be customized.
+
+Saves the fine-tuned model to HuggingFace Hub for later use.
+
+Key Hyperparameters:
+
+LoRA Parameters: LORA_R = 32, LORA_ALPHA = 64, TARGET_MODULES = ["q_proj", "v_proj", "k_proj", "o_proj"]
+
+Training Parameters: EPOCHS = 1, BATCH_SIZE = 8, LEARNING_RATE = 1e-4
+
+Optimizer: paged_adamw_32bit
+
+Training Command:
+
+fine_tuning.train()
+fine_tuning.model.push_to_hub(PROJECT_RUN_NAME, private=True)
+
+Notebook 2: Testing
+
+Features:
+
+Loads the fine-tuned model for inference.
+
+Predicts prices based on text input.
+
+Provides two prediction functions:
+
+Basic Prediction: Selects the most likely token.
+
+Improved Prediction: Uses a weighted average of top token probabilities.
+
+Key Hyperparameters:
+
+Quantization: 4-bit (bnb_4bit_compute_dtype=torch.bfloat16)
+
+Model Loading:
+
+fine_tuned_model = PeftModel.from_pretrained(base_model, FINETUNED_MODEL, revision=REVISION)
+
+Evaluation Metrics:
+
+Error: Absolute difference between predicted and actual price.
+
+RMSLE: Root Mean Squared Logarithmic Error.
+
+Hit Rate: Percentage of predictions within 20% error.
+
+Run Evaluation:
+
+Tester.test(improved_model_predict, test)
+
+Model Results
+
+GPT-4 baseline error: $396
+
+Fine-tuned LLaMA error: $127
+
+Customization
+
+Fine-tune with Custom Data:
+
+Replace the dataset in both notebooks:
+
+DATASET_NAME = "your_dataset_name"
+
+Ensure the dataset follows the format with text and price fields.
+
+Use Specific Model Versions:
+
+Pin the model version with a revision ID:
+
+REVISION = "<commit_hash>"
+
+Set REVISION = None to use the latest version.
+
+Dependencies
+
+Python 3.8+
+
+Libraries:
+
+HuggingFace Transformers
+
+PEFT
+
+BitsAndBytes
+
+TRL
+
+Accelerate
+
+WandB
+
+Contact
+
+For questions or contributions, reach out to:
+
+Author: KuoTien Wu
+
+GitHub: wu7115
+
+HuggingFace Profile: wu7115
+
 ---
 library_name: peft
 license: llama3.1
